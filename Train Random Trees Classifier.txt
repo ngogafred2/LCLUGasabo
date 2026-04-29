@@ -1,0 +1,28 @@
+The following sample script, based on the ArcGIS Pro documentation, was used in this study.
+
+TrainRandomTreesClassifier example 2 (stand-alone script)
+This is a Python script sample for the TrainRandomTreesClassifier tool.
+
+# Import system modules
+import arcpy
+from arcpy.sa import *
+
+# Set local variables
+inSegRaster = "c:/test/cities_seg.tif"
+train_features = "c:/test/train.gdb/train_features"
+out_definition = "c:/output/cities_sig.ecd"
+in_additional_raster = "c:/cities.tif"
+maxNumTrees = "50"
+maxTreeDepth = "30"
+maxSampleClass = "1000"
+attributes = "COLOR;MEAN;STD;COUNT;COMPACTNESS;RECTANGULARITY"
+
+# Check out the ArcGIS Spatial Analyst extension license
+arcpy.CheckOutExtension("Spatial")
+
+# Execute
+TrainRandomTreesClassifier(inSegRaster, train_features,
+                           out_definition, in_additional_raster, maxNumTrees,
+                           maxTreeDepth, maxSampleClass, attributes)
+
+Source link: https://desktop.arcgis.com/en/arcmap/latest/tools/spatial-analyst-toolbox/train-random-trees-classifier.htm
