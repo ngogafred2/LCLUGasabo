@@ -1,0 +1,42 @@
+The code written for Landsat Image Preprocessing Workflow for Spectral Reflectance Analysis is as follows:
+import arcpy
+from arcpy.sa import *
+import os
+
+# Set environment settings
+arcpy.env.overwriteOutput = True
+arcpy.env.workspace = r"C:\path_to_your_data"
+
+# Define input Landsat images (example paths)
+landsat7_image = "LE07_20101010.tif"
+landsat8_image = "LC08_20150914.tif"
+
+# Step 1: Clip to Region of Interest (ROI)
+roi_shapefile = r"C:\path_to_roi\study_area.shp"
+
+# Clip the Landsat images using the ROI
+landsat7_clipped = arcpy.Clip_management(landsat7_image,"#","LE07_clipped.tif",roi_shapefile)
+landsat8_clipped = arcpy.Clip_management(landsat8_image,"#","LC08_clipped.tif",roi_shapefile)
+
+# Step 2: Fill No Data values
+landsat7_filled = arcpy.sa.FillNoData(landsat7_clipped)
+landsat8_filled = arcpy.sa.FillNoData(landsat8_clipped)
+
+# Step 3: Create composite bands
+#(assuming RGB bands are 1,2,and 3 for Landsat 7,4,3,and 2 for Landsat 8)
+composite_bands7 = arcpy.management.CompositeBands([landsat7_filled,"B2","B3"])
+composite_bands8 = arcpy.management.CompositeBands([landsat8_filled,"B4","B3","B2"])
+
+# Step 4: Create RGB images (optional step,for visualization)
+rgb7 = arcpy.management.CompositeBands([composite_bands7,"B4","B5"])
+rgb8 = arcpy.management.CompositeBands([composite_bands8,"B4","B3","B2"])
+
+# Step 5: Mask the study area to isolate the region of interest
+masked_rgb7 = arcpy.sa.ExtractByMask(rgb7,roi_shapefile)
+masked_rgb8 = arcpy.sa.ExtractByMask(rgb8,roi_shapefile)
+
+# Save the final RGB and masked images
+masked_rgb7.save(r"C:\path_to_save\masked_rgb7.tif")
+masked_rgb8.save(r"C:\path_to_save\masked_rgb8.tif")
+
+print("Image preprocessing completed successfully.")
